@@ -1,0 +1,66 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>my-websocket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+	<div>
+  controller:<span id="res">123</span> websocket：<span id="webmsg">123</span> 
+  <p>
+  <input id="msg" type="text"></input>
+   <button id="wc"  width="50px" onclick="bclick()">点击</button>
+   </p>
+   </div>
+</body>
+
+	 <script type="text/javascript">
+        $(function () {
+            //写法稍微复杂，同步请求
+            $.ajax({
+                type: "get",//请求方式
+                url: "http://localhost:18888/websocket",//地址，就是json文件的请求路径
+                success: function(data){//返回的参数就是 action里面所有的有get和set方法的参数
+					console.log("1111"+data)
+					$("#res").html(data);
+			 }
+        
+        });
+})		
+
+
+var ws = new WebSocket("ws://localhost:18888/webspring");
+
+ws.onopen = function(evt) { 
+  console.log("Connection open ..."); 
+  ws.send("Hello WebSockets!");
+};
+
+ws.onmessage = function(evt) {
+  console.log( "Received Message: " + evt.data);
+$("#webmsg").html(evt.data);
+  //ws.close();
+};
+
+ws.onclose = function(evt) {
+  console.log("Connection closed.");
+}; 
+
+ws.onerror = function(evt) {
+  console.log("error!!!"); 
+};
+
+
+
+function bclick(){
+
+var msg = $("#msg").val();
+console.log("send msg:"+msg)
+ws.send(msg);
+$("#msg").val("");
+
+}
+
+</script>
+</html>

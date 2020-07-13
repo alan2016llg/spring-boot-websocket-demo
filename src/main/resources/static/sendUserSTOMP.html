@@ -1,0 +1,101 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>my-websocket</title>  
+</head>
+
+<style type="text/css">
+#res{
+color: blue;
+}
+#usermsg{
+color: red;
+}
+</style>
+<body>
+	<div>
+  show:<span id="res" ></span>,send msg:<span id="usermsg"></span> 
+  <p>
+  <input id="msg" type="text"></input>
+   <button id="wc"  width="50px" onclick="bclick()">点击</button>
+   </p>
+   </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="text/javascript">
+	
+var uuid =generateUUID();
+var message;
+function sendUser() {
+            message = $("#msg").val();
+            $.ajax({
+                type: "get",//请求方式
+                url: "http://localhost:18888/sendOneUser?"+"token="+uuid+"&msg="+message,//地址
+                success: function(data){//返回的参数就是 action里面所有的有get和set方法的参数
+					console.log("1111"+data)
+					$("#res").html(data);
+			 }
+        
+        });
+}		
+
+// <<<<<stomp websocket setting>>>>>
+
+var stompClient = null;
+
+var socket = new SockJS('http://localhost:18888/webstomp');
+	stompClient = Stomp.over(socket);
+    stompClient.connect({}, onConnected, onError);
+	
+function onConnected(){
+	stompClient.subscribe("/user/"+uuid+"/msg",onMessageReceived)
+}
+function onError(error) {
+    $("#res").html("websocket连接异常")
+}
+//接收websocket响应
+function onMessageReceived(payload){
+	var res = payload.body;
+	if(typeof res === "string"){
+	$("#usermsg").html("来自websocket:"+res);
+	}else{
+	var message = JSON.parse(res);
+	$("#usermsg").html(message.content);
+	}
+}
+function sendMessage(){
+	var content = $("#msg").val();
+	var msg = {
+		content:content
+	}
+	if(msg && stompClient){
+		stompClient.send("/app/hello",{},JSON.stringify(msg));
+		$("#msg").val("");
+	}
+}
+
+
+function bclick(){
+	//sendMessage();
+	sendUser();
+
+}
+
+function generateUUID() {
+    var d = new Date().getTime();
+    if (window.performance && typeof window.performance.now === "function") {
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+	console.log(uuid)
+    return uuid;
+}
+
+</script>
+</html>

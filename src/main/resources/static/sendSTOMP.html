@@ -1,0 +1,70 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>my-websocket</title>  
+</head>
+<body>
+	<div>
+  <span id="res">123</span> 
+  <p>
+  <input id="msg" type="text"></input>
+   <button id="wc"  width="50px" onclick="bclick()">点击</button>
+   </p>
+   </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script type="text/javascript">
+        $(function () {
+            //写法稍微复杂，同步请求
+            $.ajax({
+                type: "get",//请求方式
+                url: "http://localhost:18888/websocket",//地址
+                success: function(data){//返回的参数就是 action里面所有的有get和set方法的参数
+					console.log("1111"+data)
+					$("#res").html(data);
+			 }
+        
+        });
+})		
+
+// <<<<<stomp websocket setting>>>>>
+
+var stompClient = null;
+
+var socket = new SockJS('http://localhost:18888/webstomp');
+	stompClient = Stomp.over(socket);
+    stompClient.connect({}, onConnected, onError);
+	
+function onConnected(){
+	stompClient.subscribe("/topic/hello",onMessageReceived)
+}
+function onError(error) {
+    $("#res").html("websocket连接异常")
+}
+function onMessageReceived(payload){
+	var message = JSON.parse(payload.body);
+	//var message = payload.boy;
+	$("#res").html(message.content);
+
+}
+function sendMessage(){
+	var content = $("#msg").val();
+	var msg = {
+		content:content
+	}
+	if(msg && stompClient){
+		stompClient.send("/app/hello",{},JSON.stringify(msg));
+		$("#msg").val("");
+	}
+}
+
+
+function bclick(){
+	sendMessage();
+
+}
+
+</script>
+</html>
