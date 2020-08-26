@@ -1,6 +1,6 @@
 package com.example.websocketdemo.websocket.springtype;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -33,7 +33,7 @@ public class MyInterceptor implements HandshakeInterceptor {
         ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) serverHttpRequest;
         HttpSession session = servletRequest.getServletRequest().getSession();
         map.put("sessionId", session.getId());
-        if (StringUtils.isNotBlank(sessionid)) {
+        if (StrUtil.isNotBlank(sessionid)) {
             // 放入属性域
             map.put("token", sessionid);
             System.out.println("用户 token " + sessionid + " 握手成功！");
