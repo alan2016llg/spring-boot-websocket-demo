@@ -15,7 +15,7 @@ import java.util.Set;
  * @Date: 2020/7/11 16:37
  */
 @Slf4j
-@Component
+//@Component
 //@EnableScheduling
 public class ServerTask {
     @Scheduled(cron = "0/10 * * * * ?")

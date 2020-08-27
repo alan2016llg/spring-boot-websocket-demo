@@ -28,7 +28,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     }
     @Override
     public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
-        // 设置广播节点
+        // 设置了两个广播节点
         messageBrokerRegistry.enableSimpleBroker("/topic","/user");
         //客户端向服务端发送消息需有/app 前缀
         messageBrokerRegistry.setApplicationDestinationPrefixes("/app");
